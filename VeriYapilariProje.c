@@ -4,11 +4,23 @@
 #define BUFFER_SIZE 1024
 #define FILE_NAME_SIZE 20
 #define WORD_SIZE 6
+#define QUEUE_SIZE 1000
+
+typedef struct Queue {
+    int arr[QUEUE_SIZE];
+    int rear;
+}Queue;
 
 char** createWordList(int*);
 void printWordList(char**, int);
 int** createAdjacencyMatrix(char**, int);
 int isConnected(char**, int**, int, char*, char*);
+Queue* createQueue();
+int isEmpty(Queue*);
+int isFull(Queue*);
+int enqueue(Queue*, int);
+int dequeue(Queue*);
+
 
 int main (int argc, char *argv[]) {
     char **wordList;
@@ -135,4 +147,52 @@ int isConnected(char **wordList, int **adjacencyMatrix, int length, char *word1,
     }
     printf("Baglanti yok.\n");
     return 0;
+}
+
+Queue* createQueue() {
+    Queue *queue;
+    queue = (Queue*) malloc(sizeof(Queue));
+    if(queue == NULL) {
+        printf("Allocation error.\n");
+        exit(-1);
+    }
+    queue->rear = 0;
+    return queue;
+}
+
+int isEmpty(Queue *queue) {
+    if(queue->rear == 0) {
+        printf("Queue is empty\n");
+        return 1;
+    }
+    return 0;
+}
+int isFull(Queue *queue) {
+    if(queue->rear == QUEUE_SIZE) {
+        printf("Queue is full.\n");
+        return 1;
+    }
+    return 0;
+}
+
+int enqueue(Queue *queue, int value) {
+    if(!isFull(queue)) {
+        queue->arr[queue->rear] = value;
+        queue->rear++;
+        return 1;
+    }
+    return 0;
+}
+int dequeue(Queue *queue) {
+    int i;
+    int value;
+    if(!isEmpty(queue)) {
+        value = queue->arr[0];
+        for(i=0; i < queue->rear; i++) {
+            queue->arr[i-1] = queue->arr[i];
+        }
+        queue->rear--;
+        return value;
+    }
+    return -1;
 }
