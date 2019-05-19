@@ -3,11 +3,12 @@
 #include <string.h>
 #define BUFFER_SIZE 1024
 #define FILE_NAME_SIZE 20
-#define WORD_SIZE 5
+#define WORD_SIZE 6
 
 char** createWordList(int*);
 void printWordList(char**, int);
 int** createAdjacencyMatrix(char**, int);
+int isConnected(char**, int**, int, char*, char*);
 
 int main (int argc, char *argv[]) {
     char **wordList;
@@ -33,6 +34,10 @@ char** createWordList(int *length) {
     printf("Enter word list file name :");
     scanf("%s", fileName);
     fp = fopen(fileName, "r");
+    if(fp == NULL) {
+        printf("Error opening file.\n");
+        exit(-2);
+    }
     while(!feof(fp)) {
         fgets(buffer, BUFFER_SIZE, fp);
         count++;
@@ -51,6 +56,7 @@ char** createWordList(int *length) {
     while(!feof(fp)) {
         fgets(buffer, BUFFER_SIZE, fp);
         strcpy(wordList[i], buffer);
+        *(wordList[i]+ 5) = '\0';
         i++;
     }
     fclose(fp);
@@ -98,4 +104,35 @@ int** createAdjacencyMatrix(char **wordList, int length) {
         }
     }
     return adjacencyMatrix;
+}
+
+int isConnected(char **wordList, int **adjacencyMatrix, int length, char *word1, char *word2) {
+    int i;
+    int indexWord1;
+    int indexWord2;
+
+    i=0;
+    while(i < length && strcmp(wordList[i], word1)) {
+        i++;
+    }
+    indexWord1 = i;
+    if(indexWord1 == length) {
+        printf("%s not found!\n", word1);
+        exit(-3);
+    }
+    i=0;
+    while(i < length && strcmp(wordList[i], word2)) {
+        i++;
+    }
+    indexWord2 = i;
+    if(indexWord2 == length) {
+        printf("%s not found!\n", word2);
+        exit(-3);
+    }
+    if(adjacencyMatrix[indexWord1][indexWord2]) {
+        printf("Baglanti var.\n");
+        return 1;
+    }
+    printf("Baglanti yok.\n");
+    return 0;
 }
