@@ -4,7 +4,7 @@
 #define BUFFER_SIZE 1024
 #define FILE_NAME_SIZE 20
 #define WORD_SIZE 6
-#define QUEUE_SIZE 1000
+#define QUEUE_SIZE 3000
 
 typedef struct Queue {
     int arr[QUEUE_SIZE];
@@ -14,20 +14,17 @@ typedef struct Queue {
 char** createWordList(int*);
 void printWordList(char**, int);
 int** createAdjacencyMatrix(char**, int);
-int isConnected(char**, int**, int, char*, char*);
+int isConnected(char*, char*);
 Queue* createQueue();
 int isEmpty(Queue*);
 int isFull(Queue*);
 int enqueue(Queue*, int);
 int dequeue(Queue*);
+int findPath(char*, char*);
 
 
 int main (int argc, char *argv[]) {
-    char **wordList;
-    int length;
-    int **adjacencyMatrix;
-    wordList = createWordList(&length);
-    adjacencyMatrix = createAdjacencyMatrix(wordList, length);
+    findPath("pitch", "pithy");
     return 0;
 }
 
@@ -118,11 +115,15 @@ int** createAdjacencyMatrix(char **wordList, int length) {
     return adjacencyMatrix;
 }
 
-int isConnected(char **wordList, int **adjacencyMatrix, int length, char *word1, char *word2) {
+int isConnected(char *word1, char *word2) {
     int i;
     int indexWord1;
     int indexWord2;
-
+    char **wordList;
+    int length;
+    int **adjacencyMatrix;
+    wordList = createWordList(&length);
+    adjacencyMatrix = createAdjacencyMatrix(wordList, length);
     i=0;
     while(i < length && strcmp(wordList[i], word1)) {
         i++;
@@ -195,4 +196,59 @@ int dequeue(Queue *queue) {
         return value;
     }
     return -1;
+}
+
+int findPath(char *word1, char *word2) {
+    int i;
+    int indexWord1;
+    int indexWord2;
+    char **wordList;
+    int length;
+    int **adjacencyMatrix;
+    int *visited;
+    int instantIndex;
+    Queue *queue;
+    // Initialize
+    wordList = createWordList(&length);
+    adjacencyMatrix = createAdjacencyMatrix(wordList, length);
+    visited = (int*) calloc(length, sizeof(int));
+    i=0;
+    while(i < length && strcmp(wordList[i], word1)) {
+        i++;
+    }
+    indexWord1 = i;
+    if(indexWord1 == length) {
+        printf("%s not found!\n", word1);
+        exit(-3);
+    }
+    i=0;
+    while(i < length && strcmp(wordList[i], word2)) {
+        i++;
+    }
+    indexWord2 = i;
+    if(indexWord2 == length) {
+        printf("%s not found!\n", word2);
+        exit(-3);
+    }
+
+    // Find path
+    queue = createQueue();
+    visited[indexWord1] = 1;
+    enqueue(queue, indexWord1);
+    while(!isEmpty(queue) || visited[indexWord2]) {
+        instantIndex = dequeue(queue);
+        if(instantIndex == indexWord2) {
+            printf("%s\n", wordList[instantIndex]);
+            return 1;
+        } else {
+            printf("%s->", wordList[instantIndex]);
+            for(i=0; i < length; i++) {
+                if(!visited[i] && adjacencyMatrix[instantIndex][i]) {
+                    enqueue(queue, i);
+                    visited[i] = 1;
+                }
+            }
+        }
+    }
+    return 0;
 }
