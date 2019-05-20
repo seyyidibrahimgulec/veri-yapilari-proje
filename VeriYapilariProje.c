@@ -21,10 +21,15 @@ int isFull(Queue*);
 int enqueue(Queue*, int);
 int dequeue(Queue*);
 int findPath(char*, char*);
+char* readWord(char*);
 
 
 int main (int argc, char *argv[]) {
-    findPath("pitch", "pithy");
+    char *word1;
+    char *word2;
+    word1 = readWord("first");
+    word2 = readWord("second");
+    findPath(word1, word2);
     return 0;
 }
 
@@ -208,6 +213,7 @@ int findPath(char *word1, char *word2) {
     int *visited;
     int instantIndex;
     Queue *queue;
+
     // Initialize
     wordList = createWordList(&length);
     adjacencyMatrix = createAdjacencyMatrix(wordList, length);
@@ -250,5 +256,16 @@ int findPath(char *word1, char *word2) {
             }
         }
     }
+    printf("%s cannot be trasformed to %s\n", word1, word2);
     return 0;
+}
+
+char* readWord(char *ordinalNum) {
+    char *word;
+    int wordSize = WORD_SIZE;
+    word = (char*) malloc(sizeof(char) * WORD_SIZE);
+    printf("Enter the %s word (The word must be %d letters long! The first %d letters will be recieved.) :", ordinalNum, wordSize - 1, wordSize-1);
+    scanf("%s", word);
+    word[wordSize-1] = '\0';
+    return word;
 }
